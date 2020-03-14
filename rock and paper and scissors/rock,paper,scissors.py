@@ -2,6 +2,7 @@ import pygame as pg
 import os
 import pygame, sys
 #from pygame.locals import *
+import pygame.locals as pgl
 import random
 WIDTH = 800   # Window width: keep within screen resolution eg max 1366
 HEIGHT = 500  # Window height: keep within screen resolution eg max 768
@@ -40,7 +41,6 @@ class Button(pg.sprite.Sprite):
 		self.rect = self.image.get_rect()
 		self.rect.center = (x, y)
 		self.move = move
-		
 		self.draw_text(self.move, 15, BLACK, int(self.rect.width/2), int(self.rect.height / 2))
 		
 	def isOver(self, pos):
@@ -61,18 +61,22 @@ class Button(pg.sprite.Sprite):
         
 	def update(self):
 		pos = pg.mouse.get_pos()
-		if event.type == pg.MOUSEBUTTONDOWN:
-			if self.isOver(pos):
-				player.move = self.move
+		
+		for event in pg.event.get():
+			pos = pg.mouse.get_pos()
+			if event.type == pg.MOUSEBUTTONDOWN:
+				if self.isOver(pos):
+					player.move = self.move
+					
+			if event.type == pg.MOUSEMOTION:
+				if self.isOver(pos):
+					self.image.fill(LIGHT_SILVER)
+					self.image.blit(self.text_surface, self.text_rect)
+				else:
+					self.image.fill(SILVER)
+					self.image.blit(self.text_surface, self.text_rect)
 				
-		if event.type == pg.MOUSEMOTION:
-			if self.isOver(pos):
-				self.image.fill(LIGHT_SILVER)
-				self.image.blit(self.text_surface, self.text_rect)
-			else:
-				self.image.fill(SILVER)
-				self.image.blit(self.text_surface, self.text_rect)
-			
+button = Button(1,1,"")
 class Player(pg.sprite.Sprite):
 	def __init__(self):
 		pg.sprite.Sprite.__init__(self)
@@ -221,7 +225,6 @@ buttons.add(scissor_button)
 # game loop
 running = True # running is a variable. You can use anything e.g. continue, dontStop etc
 while running:
-	# keep loop running at correct speed
 	clock.tick(FPS)
 	#drawing text
 	check_score()
